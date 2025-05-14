@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info:
+  title: PDF RAG System API
+  description: API for querying PDF documents using RAG technology
+  version: 1.0.0
+servers:
+  - url: https://your-ngrok-url.ngrok-free.app
+    description: Development server
+
+paths:
+  /query:
+    post:
+      operationId: askQuestion
+      summary: Ask a question about the documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                  description: The question to ask about the documents
+              required:
+                - question
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: string
+                    description: The answer to the question
+                  status:
+                    type: string
+                    description: Status of the response
+                  last_sync:
+                    type: number
+                    description: Timestamp of last document sync
+        '503':
+          description: System is currently syncing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  status:
+                    type: string
+
+  /status:
+    get:
+      operationId: getStatus
+      summary: Get system status
+      responses:
+        '200':
+          description: Current system status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_syncing:
+                    type: boolean
+                    description: Whether the system is currently syncing
+                  last_sync:
+                    type: number
+                    description: Timestamp of last document sync
+                  error:
+                    type: string
+                    description: Any error message
+                  documents_processed:
+                    type: integer
+                    description: Number of documents processed
+                  vector_store_ready:
+                    type: boolean
+                    description: Whether the vector store is ready
+
+  /sync:
+    post:
+      operationId: syncDocuments
+      summary: Trigger document synchronization
+      responses:
+        '202':
+          description: Sync started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  is_syncing:
+                    type: boolean
+        '200':
+          description: Sync already in progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  last_sync:
+                    type: number
+
+  /reset:
+    post:
+      operationId: resetMemory
+      summary: Reset conversation memory
+      responses:
+        '200':
+          description: Memory reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
